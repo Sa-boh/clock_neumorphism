@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <title>Clock Neumorphism</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="resetStyles.css">
+</head>
+
+<body>
+  <main>
+    <div class="clockWrapper">
+      <img src="images/clock4.png" alt="clock">
+
+      <div class="clockCenterPoint">
+        <div class="hr"></div>
+        <div class="min"></div>
+        <div class="sec"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const hr = document.querySelector('.hr');
+    const min = document.querySelector('.min');
+    const sec = document.querySelector('.sec');
+
+    const currentTime = new Date();
+
+    const hours = currentTime.getHours();
+    const minutes = currentTime.getMinutes();
+    const seconds = currentTime.getSeconds();
+
+    //Bringe alle Zeiger auf aktuelle Position
+    timeInitalSetUp();
+
+    //Aktualisiere Sekundenzeiger-Rotation & Minutenzeiger-Rotation jede Sekunde
+    setInterval(() => {
+      let secCurrentDegree = sec.style.transform.slice(8).replace('deg)', '');
+      let secNewDegree = parseFloat(secCurrentDegree) + 6;
+      sec.style.transform = 'rotateZ(' + secNewDegree + 'deg)';
+
+      let minCurrentDegree = min.style.transform.slice(8).replace('deg)', '');
+      let minNewDegree = parseFloat(minCurrentDegree) + 0.1;
+      min.style.transform = 'rotateZ(' + minNewDegree + 'deg)';
+    }, 1000);
+
+    /*Erster Timer hat ein Timout von intervalMinute => restliche Sekunden bis zur vollen Minute
+    Timer soll immer einsetzen wenn eine volle Minute vergangen ist. Wenn Sekundenzeiger zum ersten mal auf 12 Uhr ist, wird jeder weitere Timeout mit einem Timer von 60000ms aufgerufen.*/
+    let intervalMinute = 60000 - (seconds * 1000);
+    //Aktualisiere Stundenzeiger-Rotation jede Minute
+    hourInterval(intervalMinute)
+
+    function hourInterval(timer) {
+      setTimeout(() => {
+        let hrCurrentDegree = hr.style.transform.slice(8).replace('deg)', '');
+        let hrNewDegree = parseFloat(hrCurrentDegree) + 0.5;
+        hr.style.transform = 'rotateZ(' + hrNewDegree + 'deg)';
+
+        hourInterval(60000);
+      }, timer);
+    }
+
+    function timeInitalSetUp() {
+      //Jede volle Stunde sind 30° ; jede Minute & Sekunde -> 6°
+      /*Stunde: hours*30 um Zeiger auf volle Stunde auszurichten &
+      0.5*minutes um Minuten auf Stundenzeiger zu übertragen*/
+      // -180 um alle Zeiger auf 00:00 Uhr zu korrigieren -> normal zeigen sie auf 6 Uhr
+      hr.style.transform = 'rotateZ(' + (hours * 30 - 180 + (0.5 * minutes)) + 'deg)';
+      min.style.transform = 'rotateZ(' + (minutes * 6 - 180 + (0.1 * seconds)) + 'deg)';
+      sec.style.transform = 'rotateZ(' + (seconds * 6 - 180) + 'deg)';
+    }
+  </script>
+</body>
+
+</html>
